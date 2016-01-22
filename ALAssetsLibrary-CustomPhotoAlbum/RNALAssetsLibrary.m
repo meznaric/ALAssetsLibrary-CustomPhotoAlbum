@@ -40,19 +40,10 @@ RCT_EXPORT_METHOD(
  
   ALAssetsLibrary* library = [[ALAssetsLibrary alloc] init];
   [library saveImage:image toAlbum:album completion:^(NSURL *assetURL, NSError *error) {
-      resolve();
+      resolve([assetURL absoluteString]);
   } failure:^(NSError *error) {
       reject(error);
   }];
-}
-
-RCT_EXPORT_METHOD(
-                  getAlbumPhotos:(nonnull NSString *)album
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject
-)
-{
-  resolve(@"Done!");
 }
 
 RCT_EXPORT_METHOD(
@@ -78,45 +69,6 @@ RCT_EXPORT_METHOD(
   }
 }
 
--(NSMutableArray *) getContentFrom:(ALAssetsGroup *) group withAssetFilter:(ALAssetsFilter *)filter
-{
-  NSMutableArray *contentArray = [NSMutableArray array];
-
-  [group setAssetsFilter:filter];
-  
-  [group enumerateAssetsUsingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
-    
-    //ALAssetRepresentation holds all the information about the asset being accessed.
-    if(result)
-    {
-      
-      ALAssetRepresentation *representation = [result defaultRepresentation];
-      
-      //Stores releavant information required from the library
-      NSMutableDictionary *tempDictionary = [[NSMutableDictionary alloc] init];
-      //Get the url and timestamp of the images in the ASSET LIBRARY.
-      NSString *imageUrl = [representation UTI];
-      NSDictionary *metaDataDictonary = [representation metadata];
-      NSString *dateString = [result valueForProperty:ALAssetPropertyDate];
-      
-      //            NSLog(@"imageUrl %@",imageUrl);
-                  NSLog(@"metadictionary: %@",metaDataDictonary);
-      
-      //Check for the date that is applied to the image
-      // In case its earlier than the last sync date then skip it. ##TODO##
-      
-      NSString *imageKey = @"ImageUrl";
-      NSString *metaKey = @"MetaData";
-      NSString *dateKey = @"CreatedDate";
-      [tempDictionary setObject:imageUrl forKey:@"imageUrl"];
-      [tempDictionary setObject:@"haha" forKey:@"metaData"];
-      [tempDictionary setObject:@"date" forKey:@"createdDate"];
-      //Add the values to photos array.
-      [contentArray addObject:[tempDictionary copy]];
-    }
-  }];
-  return contentArray;
-}
 
 
 @end
