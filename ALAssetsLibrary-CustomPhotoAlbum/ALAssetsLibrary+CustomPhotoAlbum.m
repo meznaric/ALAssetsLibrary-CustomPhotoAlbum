@@ -361,7 +361,6 @@
       [group enumerateAssetsUsingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
         // Checking if group isn't empty
         if (! result) return;
-        
         // Getting the image from the asset
         UIImageOrientation orientation =
           (UIImageOrientation)[[result valueForProperty:@"ALAssetPropertyOrientation"] intValue];
@@ -389,5 +388,49 @@
                       usingBlock:block
                     failureBlock:failureBlock];
 }
+
+
+- (void)getImagesFromAlbum:(NSString *)albumName
+                 completion:(void (^)(NSMutableArray *, NSError *))completion
+{
+  ALAssetsLibraryGroupsEnumerationResultsBlock block = ^(ALAssetsGroup *group, BOOL *stop) {
+    // Checking if library exists
+    if (group == nil) {
+      *stop = YES;
+      return;
+    }
+    
+    // If we have found library with given title we enumerate it
+    if ([albumName compare:[group valueForProperty:ALAssetsGroupPropertyName]] == NSOrderedSame) {
+      NSMutableArray * images = [[NSMutableArray alloc] init];
+      [group enumerateAssetsUsingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
+        // Checking if group isn't empty
+        if (! result) return;
+        NSString * assetUrl = ([result.defaultRepresentation.url absoluteString]);
+        // Saving this image to the array
+        NSMutableDictionary * tempDictionary = [[NSMutableDictionary alloc] init];
+        [tempDictionary setObject:assetUrl forKey:@"imageUrl"];
+        [tempDictionary setObject:[result.defaultRepresentation.metadata copy] forKey:@"metaData"];
+        [images addObject:[tempDictionary copy]];
+      }];
+      
+      // Execute the |completion| block
+      if (completion) completion(images, nil);
+      
+      // Album was found, bail out of the method
+      *stop = YES;
+    }
+  };
+  
+  ALAssetsLibraryAccessFailureBlock failureBlock = ^(NSError *error) {
+    NSLog(@"%s: %@", __PRETTY_FUNCTION__, [error localizedDescription]);
+    if (completion) completion(nil, error);
+  };
+  
+  [self enumerateGroupsWithTypes:ALAssetsGroupAll
+                      usingBlock:block
+                    failureBlock:failureBlock];
+}
+
 
 @end

@@ -79,4 +79,13 @@
 - (void)loadImagesFromAlbum:(NSString *)albumName
                  completion:(void (^)(NSMutableArray *images, NSError *error))completion;
 
+/*! Get's asset paths from the assets group (album)
+ *
+ * \param albumName Custom album name
+ * \param completion Block to be executed when succeed or failed to load images from target album
+ */
+- (void)getImagesFromAlbum:(NSString *)albumName
+                 completion:(void (^)(NSMutableArray *images, NSError *error))completion;
+
+
 @end
