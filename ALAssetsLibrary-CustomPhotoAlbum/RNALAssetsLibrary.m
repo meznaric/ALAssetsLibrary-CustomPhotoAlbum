@@ -25,7 +25,8 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_METHOD(
                   saveImageToAlbum:(nonnull NSNumber *)reactTag
                   albumName:(NSString *)album
-                  callback:(RCTResponseSenderBlock)callback
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject
                   )
 {
   UIView *view = [self.bridge.uiManager viewForReactTag:reactTag];
@@ -39,9 +40,9 @@ RCT_EXPORT_METHOD(
  
   ALAssetsLibrary* library = [[ALAssetsLibrary alloc] init];
   [library saveImage:image toAlbum:album completion:^(NSURL *assetURL, NSError *error) {
-    callback(@[[NSNull null], @"Image saved"]);
+      resolve();
   } failure:^(NSError *error) {
-    callback(@[@"Error saving image!"]);
+      reject(error);
   }];
 }
 
