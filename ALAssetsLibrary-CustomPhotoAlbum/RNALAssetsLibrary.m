@@ -37,10 +37,17 @@ RCT_EXPORT_METHOD(
   [view drawViewHierarchyInRect:CGRectMake(0, 0, view.frame.size.width, view.frame.size.height) afterScreenUpdates:YES];
   UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
   UIGraphicsEndImageContext();
- 
+  NSNumber *width  = [NSNumber numberWithFloat:image.size.width];
+  NSNumber *height = [NSNumber numberWithFloat:image.size.height];
+  
   ALAssetsLibrary* library = [[ALAssetsLibrary alloc] init];
   [library saveImage:image toAlbum:album completion:^(NSURL *assetURL, NSError *error) {
-      resolve([assetURL absoluteString]);
+      NSDictionary * image = @{
+                             @"uri":[assetURL absoluteString],
+                             @"width":width,
+                             @"height":height
+                             };
+      resolve(image);
   } failure:^(NSError *error) {
       reject(error);
   }];
