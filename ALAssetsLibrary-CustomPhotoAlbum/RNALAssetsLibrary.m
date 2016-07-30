@@ -49,7 +49,7 @@ RCT_EXPORT_METHOD(
                              };
       resolve(image);
   } failure:^(NSError *error) {
-      reject(error);
+      reject(@"500", @"Problem saving image to album", error);
   }];
 }
 
@@ -64,15 +64,13 @@ RCT_EXPORT_METHOD(
     ALAssetsLibrary* library = [[ALAssetsLibrary alloc] init];
     [library getImagesFromAlbum:album completion:^(NSMutableArray *images, NSError *error) {
       if(error) {
-        return reject(error);
+        return reject(@"500", @"Problem getting images from album.", error);
       }
       resolve([images copy]);
     }];
   }
   else{
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Permission Denied" message:@"Please allow the application to access your photo and videos in settings panel of your device" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles: nil];
-    [alertView show];
-    reject([NSError errorWithDomain:@"Permission denied" code:403 userInfo:NULL]);
+    reject(@"403", @"Permission denied `getSavedImages`", [NSError errorWithDomain:@"Permission denied" code:403 userInfo:NULL]);
   }
 }
 
