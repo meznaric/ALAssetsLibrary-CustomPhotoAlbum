@@ -404,7 +404,7 @@
     }
     // If we have found library with given title we enumerate it
     if ([albumName compare:[group valueForProperty:ALAssetsGroupPropertyName]] == NSOrderedSame) {
-      
+
       NSMutableArray * images = [[NSMutableArray alloc] init];
       [group enumerateAssetsUsingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
         // Checking if group isn't empty
