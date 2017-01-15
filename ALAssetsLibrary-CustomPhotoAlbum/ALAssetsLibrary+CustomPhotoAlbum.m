@@ -393,15 +393,18 @@
 - (void)getImagesFromAlbum:(NSString *)albumName
                  completion:(void (^)(NSMutableArray *, NSError *))completion
 {
+  __block bool found = false;
   ALAssetsLibraryGroupsEnumerationResultsBlock block = ^(ALAssetsGroup *group, BOOL *stop) {
     // Checking if library exists
     if (group == nil) {
       *stop = YES;
+      NSError *err = [NSError errorWithDomain:@"Album not found" code:404 userInfo:nil];
+      if (completion && !found) completion(nil, err);
       return;
     }
-    
     // If we have found library with given title we enumerate it
     if ([albumName compare:[group valueForProperty:ALAssetsGroupPropertyName]] == NSOrderedSame) {
+
       NSMutableArray * images = [[NSMutableArray alloc] init];
       [group enumerateAssetsUsingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
         // Checking if group isn't empty
@@ -416,7 +419,7 @@
       
       // Execute the |completion| block
       if (completion) completion(images, nil);
-      
+      found = true;
       // Album was found, bail out of the method
       *stop = YES;
     }
